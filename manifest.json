@@ -1,6 +1,6 @@
 {
   "name": "有機構造式暗記倶楽部",
-  "short_name": "構造式暗記",
+  "short_name": "有機構造式暗記",
   "description": "有機化学の構造式を暗記するためのWebアプリ",
   "start_url": "./index.html",
   "display": "standalone",
