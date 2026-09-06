@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="1.0.0">
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>有機構造式暗記倶楽部</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-color: #333333;
+      --border-color: #e9ecef;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 15px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .mode-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 8px 18px;
+      border: 2px solid var(--secondary-color);
+      background-color: #fff;
+      color: var(--secondary-color);
+      font-weight: bold;
+      font-size: 14px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background-color: var(--secondary-color);
+      color: #fff;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    select, input {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      max-width: 100%;
+    }
+
+    select {
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      width: 100%;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-category {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+      background-color: var(--secondary-color);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .card-name {
+      font-size: 17px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+      word-break: break-word;
+    }
+
+    .card-img-box {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #ffffff;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 120px;
+    }
+
+    .card-img-box img, .qa-img img {
+      max-width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+    }
+
+    .count-info {
+      text-align: right;
+      margin-bottom: 10px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    /* 1問1答モード用スタイル */
+    .qa-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 5px;
+      width: 100%;
+      padding-bottom: 70px; /* 下部固定ボタン用の余白 */
+    }
+
+    .qa-card {
+      width: 100%;
+      max-width: 500px;
+      background-color: #fff;
+      border: 2px solid var(--secondary-color);
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .qa-card:hover {
+      border-color: #1d6fa5;
+    }
+
+    .qa-hint {
+      font-size: 12px;
+      color: #888;
+      margin: 10px 0;
+    }
+
+    .qa-answer {
+      margin-top: 10px;
+      padding: 12px;
+      background-color: #e8f4fc;
+      border-radius: 8px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* チェックボックスエリア */
+    .review-checkbox-label {
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #e74c3c;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #fff5f5;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid #fbcfe8;
+    }
+
+    .review-checkbox-label input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .qa-btn {
+      margin-top: 15px;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      transition: background-color 0.2s;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .qa-btn:hover {
+      background-color: #219150;
+    }
+
+    .qa-progress {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      select, input[type="text"] {
+        width: 100%;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .qa-card {
+        padding: 15px;
+        min-height: 260px;
+      }
+
+      .qa-btn {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+        max-width: calc(100% - 30px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>有機構造式暗記倶楽部</h1>
+
+  <!-- モード切替 -->
+  <div class="mode-tabs">
+    <button class="tab-btn active" id="btnListMode">一覧モード</button>
+    <button class="tab-btn" id="btnQaMode">1問1答モード</button>
+  </div>
+
+  <!-- 絞り込み・設定コントロール -->
+  <div class="controls">
+    <select id="categoryFilter">
+      <option value="ALL">すべてのカテゴリー（全75種）</option>
+      <option value="炭化水素">炭化水素</option>
+      <option value="アルコール・エーテル">アルコール・エーテル</option>
+      <option value="アルデヒド・ケトン">アルデヒド・ケトン</option>
+      <option value="カルボン酸">カルボン酸</option>
+      <option value="芳香族（1置換体）">芳香族（1置換体）</option>
+      <option value="芳香族（2置換体以上）">芳香族（2置換体以上）</option>
+      <option value="芳香族（誘導体）">芳香族（誘導体）</option>
+      <option value="糖類">糖類</option>
+      <option value="アミノ酸の側鎖">アミノ酸の側鎖</option>
+      <option value="高分子の原料">高分子の原料</option>
+    </select>
+    
+    <!-- 1問1答専用：出題形式の設定 -->
+    <select id="qaTypeSelect" class="hidden">
+      <option value="imgToName">問題: 構造式 ➔ 答: 物質名</option>
+      <option value="nameToImg">問題: 物質名 ➔ 答: 構造式</option>
+    </select>
+
+    <!-- 1問1答専用：出題順序の設定 -->
+    <select id="orderSelect" class="hidden">
+      <option value="random">出題順: ランダム（全問被りなし）</option>
+      <option value="sequential">出題順: 順番通り</option>
+      <option value="reviewOnly">出題順: 要復習チェックのみ</option>
+    </select>
+
+    <input type="text" id="searchInput" placeholder="物質名やキーワードで検索...">
+  </div>
+
+  <!-- 一覧モードエリア -->
+  <div id="listModeArea">
+    <div class="count-info" id="countInfo">表示中: 0 件</div>
+    <div class="grid" id="cardGrid"></div>
+  </div>
+
+  <!-- 1問1答モードエリア -->
+  <div id="qaModeArea" class="hidden">
+    <div class="qa-container">
+      <div class="qa-progress" id="qaProgress">進捗: 0 / 0</div>
+      <div class="qa-card" id="qaCard">
+        <div style="width: 100%;">
+          <span class="card-category" id="qaCategory">-</span>
+          <div id="qaQuestionContent" style="margin-top: 10px;">-</div>
+        </div>
+        
+        <div id="qaAnswerBox" class="qa-answer hidden">
+          <div style="font-size: 12px; color: #555; margin-bottom: 4px;">【解答】</div>
+          <div id="qaAnswerContent">-</div>
+        </div>
+        
+        <div class="qa-hint" id="qaHint">クリック／タップで答えを表示</div>
+
+        <!-- 要復習チェックボックス -->
+        <label class="review-checkbox-label" id="reviewCheckContainer" onclick="event.stopPropagation();">
+          <input type="checkbox" id="qaReviewCheck">
+          <span>要復習（間違えた）</span>
+        </label>
+      </div>
+      <button class="qa-btn" id="nextQaBtn">次の問題へ ➔</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==========================================
+  // 暗記データベース（全75物質）
+  // ==========================================
+  const chemicalData = [
+    // 炭化水素
+    { id: 1, file: "methane", name: "メタン", category: "炭化水素" },
+    { id: 2, file: "ethane", name: "エタン", category: "炭化水素" },
+    { id: 3, file: "propane", name: "プロパン", category: "炭化水素" },
+    { id: 4, file: "butane", name: "ブタン", category: "炭化水素" },
+    { id: 5, file: "ethylene", name: "エチレン", category: "炭化水素" },
+    { id: 6, file: "propene", name: "プロペン", category: "炭化水素" },
+    { id: 7, file: "1-butene", name: "1-ブテン", category: "炭化水素" },
+    { id: 8, file: "cis-2-butene", name: "シス-2-ブテン", category: "炭化水素" },
+    { id: 9, file: "trans-2-butene", name: "トランス-2-ブテン", category: "炭化水素" },
+    { id: 10, file: "acetylene", name: "アセチレン", category: "炭化水素" },
+    { id: 11, file: "propyne", name: "プロピン", category: "炭化水素" },
+    { id: 12, file: "1-butyne", name: "1-ブチン", category: "炭化水素" },
+    { id: 13, file: "cyclobutane", name: "シクロブタン", category: "炭化水素" },
+
+    // アルコール・エーテル
+    { id: 14, file: "methanol", name: "メタノール", category: "アルコール・エーテル" },
+    { id: 15, file: "ethanol", name: "エタノール", category: "アルコール・エーテル" },
+    { id: 16, file: "1-propanol", name: "1-プロパノール", category: "アルコール・エーテル" },
+    { id: 17, file: "dimethyl-ether", name: "ジメチルエーテル", category: "アルコール・エーテル" },
+    { id: 18, file: "diethyl-ether", name: "ジエチルエーテル", category: "アルコール・エーテル" },
+
+    // アルデヒド・ケトン
+    { id: 19, file: "formaldehyde", name: "ホルムアルデヒド", category: "アルデヒド・ケトン" },
+    { id: 20, file: "acetaldehyde", name: "アセトアルデヒド", category: "アルデヒド・ケトン" },
+    { id: 21, file: "vinyl-alcohol", name: "ビニルアルコール", category: "アルデヒド・ケトン" },
+    { id: 22, file: "acetone", name: "アセトン", category: "アルデヒド・ケトン" },
+
+    // カルボン酸
+    { id: 23, file: "formic-acid", name: "ギ酸", category: "カルボン酸" },
+    { id: 24, file: "acetic-acid", name: "酢酸", category: "カルボン酸" },
+    { id: 25, file: "fumaric-acid", name: "フマル酸", category: "カルボン酸" },
+    { id: 26, file: "maleic-acid", name: "マレイン酸", category: "カルボン酸" },
+    { id: 27, file: "maleic-anhydride", name: "無水マレイン酸", category: "カルボン酸" },
+    { id: 28, file: "acetic-anhydride", name: "無水酢酸", category: "カルボン酸" },
+
+    // 芳香族（1置換体）
+    { id: 29, file: "benzene", name: "ベンゼン", category: "芳香族（1置換体）" },
+    { id: 30, file: "chlorobenzene", name: "クロロベンゼン", category: "芳香族（1置換体）" },
+    { id: 31, file: "nitrobenzene", name: "ニトロベンゼン", category: "芳香族（1置換体）" },
+    { id: 32, file: "benzenesulfonic-acid", name: "ベンゼンスルホン酸", category: "芳香族（1置換体）" },
+    { id: 33, file: "phenol", name: "フェノール", category: "芳香族（1置換体）" },
+    { id: 34, file: "benzoic-acid", name: "安息香酸", category: "芳香族（1置換体）" },
+    { id: 35, file: "toluene", name: "トルエン", category: "芳香族（1置換体）" },
+    { id: 36, file: "aniline", name: "アニリン", category: "芳香族（1置換体）" },
+    { id: 37, file: "aniline hydrochloride", name: "アニリン塩酸塩", category: "芳香族（1置換体）" },
+    { id: 38, file: "styrene", name: "スチレン", category: "芳香族（1置換体）" },
+
+    // 芳香族（2置換体以上）
+    { id: 39, file: "o-cresol", name: "o-クレゾール", category: "芳香族（2置換体以上）" },
+    { id: 40, file: "o-xylene", name: "o-キシレン", category: "芳香族（2置換体以上）" },
+    { id: 41, file: "salicylic-acid", name: "サリチル酸", category: "芳香族（2置換体以上）" },
+    { id: 42, file: "methyl-salicylate", name: "サリチル酸メチル", category: "芳香族（2置換体以上）" },
+    { id: 43, file: "acetylsalicylic-acid", name: "アセチルサリチル酸", category: "芳香族（2置換体以上）" },
+    { id: 44, file: "phthalic-acid", name: "フタル酸", category: "芳香族（2置換体以上）" },
+    { id: 45, file: "phthalic-anhydride", name: "無水フタル酸", category: "芳香族（2置換体以上）" },
+    { id: 46, file: "isophthalic-acid", name: "イソフタル酸", category: "芳香族（2置換体以上）" },
+    { id: 47, file: "terephthalic-acid", name: "テレフタル酸", category: "芳香族（2置換体以上）" },
+
+    // 芳香族（誘導体）
+    { id: 48, file: "picric-acid", name: "ピクリン酸", category: "芳香族（誘導体）" },
+    { id: 49, file: "TNT", name: "TNT", category: "芳香族（誘導体）" },
+    { id: 50, file: "benzenediazonium chloride", name: "塩化ベンゼンジアゾニウム", category: "芳香族（誘導体）" },
+    { id: 51, file: "p-hydroxyazobenzene", name: "p-ヒドロキシアゾベンゼン", category: "芳香族（誘導体）" },
+
+    // 糖類
+    { id: 52, file: "alpha-glucose", name: "α-グルコース", category: "糖類" },
+    { id: 53, file: "beta-glucose", name: "β-グルコース", category: "糖類" },
+    { id: 54, file: "beta-galactose", name: "β-ガラクトース", category: "糖類" },
+    { id: 55, file: "beta-fructose6", name: "β-フルクトース（6員環）", category: "糖類" },
+    { id: 56, file: "beta-fructose5", name: "β-フルクトース（5員環）", category: "糖類" },
+
+    // アミノ酸の側鎖
+    { id: 57, file: "glycine", name: "グリシン", category: "アミノ酸の側鎖" },
+    { id: 58, file: "alanine", name: "アラニン", category: "アミノ酸の側鎖" },
+    { id: 59, file: "phenylalanine", name: "フェニルアラニン", category: "アミノ酸の側鎖" },
+    { id: 60, file: "tyrosine", name: "チロシン", category: "アミノ酸の側鎖" },
+    { id: 61, file: "serine", name: "セリン", category: "アミノ酸の側鎖" },
+    { id: 62, file: "cysteine", name: "システイン", category: "アミノ酸の側鎖" },
+    { id: 63, file: "methionine", name: "メチオニン", category: "アミノ酸の側鎖" },
+    { id: 64, file: "lysine", name: "リシン", category: "アミノ酸の側鎖" },
+    { id: 65, file: "aspartic-acid", name: "アスパラギン酸", category: "アミノ酸の側鎖" },
+    { id: 66, file: "glutamic-acid", name: "グルタミン酸", category: "アミノ酸の側鎖" },
+
+    // 高分子の原料
+    { id: 67, file: "vinyl-acetate", name: "酢酸ビニル", category: "高分子の原料" },
+    { id: 68, file: "vinyl-chloride", name: "塩化ビニル", category: "高分子の原料" },
+    { id: 69, file: "acrylonitrile", name: "アクリロニトリル", category: "高分子の原料" },
+    { id: 70, file: "terephthalic-acid2", name: "テレフタル酸（別構造）", category: "高分子の原料" },
+    { id: 71, file: "ethylene glycol", name: "エチレングリコール", category: "高分子の原料" },
+    { id: 72, file: "adipic acid", name: "アジピン酸", category: "高分子の原料" },
+    { id: 73, file: "hexamethylenediamine", name: "ヘキサメチレンジアミン", category: "高分子の原料" },
+    { id: 74, file: "methyl methacrylate", name: "メタクリル酸メチル", category: "高分子の原料" },
+    { id: 75, file: "epsilon-caprolactam", name: "ε-カプロラクタム", category: "高分子の原料" }
+  ];
+
+  let currentMode = "list";
+  let qaDeck = [];
+  let qaIndex = 0;
+  let currentQaItem = null;
+  const reviewSet = new Set();
+
+  const categoryFilter = document.getElementById("categoryFilter");
+  const qaTypeSelect = document.getElementById("qaTypeSelect");
+  const orderSelect = document.getElementById("orderSelect");
+  const searchInput = document.getElementById("searchInput");
+  const cardGrid = document.getElementById("cardGrid");
+  const countInfo = document.getElementById("countInfo");
+
+  const btnListMode = document.getElementById("btnListMode");
+  const btnQaMode = document.getElementById("btnQaMode");
+  const listModeArea = document.getElementById("listModeArea");
+  const qaModeArea = document.getElementById("qaModeArea");
+
+  const qaCard = document.getElementById("qaCard");
+  const qaCategory = document.getElementById("qaCategory");
+  const qaQuestionContent = document.getElementById("qaQuestionContent");
+  const qaAnswerContent = document.getElementById("qaAnswerContent");
+  const qaAnswerBox = document.getElementById("qaAnswerBox");
+  const qaHint = document.getElementById("qaHint");
+  const qaProgress = document.getElementById("qaProgress");
+  const nextQaBtn = document.getElementById("nextQaBtn");
+  const qaReviewCheck = document.getElementById("qaReviewCheck");
+
+  function getImgPath(filename) {
+    return encodeURIComponent(filename) + ".png";
+  }
+
+  function getFilteredData() {
+    const selectedCategory = categoryFilter.value;
+    const keyword = searchInput.value.toLowerCase().trim();
+
+    return chemicalData.filter(item => {
+      const matchCat = (selectedCategory === "ALL" || item.category === selectedCategory);
+      const matchKey = (item.name.toLowerCase().includes(keyword) ||
+                        item.file.toLowerCase().includes(keyword));
+      return matchCat && matchKey;
+    });
+  }
+
+  function renderList() {
+    const filtered = getFilteredData();
+    cardGrid.innerHTML = "";
+
+    filtered.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <span class="card-category">${item.category}</span>
+        <div class="card-name">${item.name}</div>
+        <div class="card-img-box">
+          <img src="${getImgPath(item.file)}" alt="${item.name}" onerror="this.onerror=null; this.alt='[画像非表示: ${item.file}.png]';">
+        </div>
+      `;
+      cardGrid.appendChild(card);
+    });
+
+    countInfo.textContent = `表示中: ${filtered.length} 件 / 全 ${chemicalData.length} 件`;
+  }
+
+  function shuffle(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function resetQaDeck() {
+    let filtered = getFilteredData();
+
+    if (orderSelect.value === "reviewOnly") {
+      filtered = filtered.filter(item => reviewSet.has(item.id));
+    }
+
+    if (filtered.length === 0) {
+      qaDeck = [];
+      qaIndex = 0;
+      return;
+    }
+
+    if (orderSelect.value === "random" || orderSelect.value === "reviewOnly") {
+      qaDeck = shuffle(filtered);
+    } else {
+      qaDeck = [...filtered];
+    }
+    qaIndex = 0;
+  }
+
+  function showNextQaQuestion() {
+    if (qaDeck.length === 0) {
+      qaCategory.textContent = "-";
+      if (orderSelect.value === "reviewOnly") {
+        qaQuestionContent.innerHTML = "<div style='font-size:16px; font-weight:bold;'>復習用（要復習）の問題はありません！</div>";
+      } else {
+        qaQuestionContent.innerHTML = "<div style='font-size:16px; font-weight:bold;'>該当する問題がありません</div>";
+      }
+      qaAnswerContent.textContent = "-";
+      qaProgress.textContent = "進捗: 0 / 0";
+      qaAnswerBox.classList.add("hidden");
+      qaHint.classList.add("hidden");
+      document.getElementById("reviewCheckContainer").classList.add("hidden");
+      currentQaItem = null;
+      return;
+    }
+
+    document.getElementById("reviewCheckContainer").classList.remove("hidden");
+
+    if (qaIndex >= qaDeck.length) {
+      const currentFiltered = getFilteredData();
+      const currentReviewItems = currentFiltered.filter(item => reviewSet.has(item.id));
+
+      if (currentReviewItems.length > 0) {
+        const doReview = confirm(`1周が完了しました！\n「要復習」にチェックした問題が ${currentReviewItems.length} 件あります。\n復習周回を開始しますか？`);
+        if (doReview) {
+          orderSelect.value = "reviewOnly";
+        }
+      } else if (orderSelect.value === "reviewOnly") {
+        alert("復習チェックのついた問題をすべて周回しました！\n通常モードに戻ります。");
+        orderSelect.value = "random";
+      }
+      resetQaDeck();
+    }
+
+    currentQaItem = qaDeck[qaIndex];
+
+    qaCategory.textContent = currentQaItem.category;
+
+    const qaType = qaTypeSelect.value;
+    const imgHtml = `<div class="qa-img"><img src="${getImgPath(currentQaItem.file)}" alt="${currentQaItem.name}" onerror="this.onerror=null; this.alt='[画像非表示: ${currentQaItem.file}.png]';"></div>`;
+    const nameHtml = `<div style="font-size: 20px; font-weight: bold; color: var(--primary-color);">${currentQaItem.name}</div>`;
+
+    if (qaType === "imgToName") {
+      qaQuestionContent.innerHTML = imgHtml;
+      qaAnswerContent.innerHTML = nameHtml;
+    } else {
+      qaQuestionContent.innerHTML = nameHtml;
+      qaAnswerContent.innerHTML = imgHtml;
+    }
+
+    qaReviewCheck.checked = reviewSet.has(currentQaItem.id);
+
+    const prefix = orderSelect.value === "reviewOnly" ? "【復習中】" : "";
+    qaProgress.textContent = `${prefix}進捗: ${qaIndex + 1} / ${qaDeck.length}`;
+
+    qaAnswerBox.classList.add("hidden");
+    qaHint.classList.remove("hidden");
+
+    qaIndex++;
+  }
+
+  qaReviewCheck.addEventListener("change", (e) => {
+    if (!currentQaItem) return;
+    if (e.target.checked) {
+      reviewSet.add(currentQaItem.id);
+    } else {
+      reviewSet.delete(currentQaItem.id);
+    }
+  });
+
+  btnListMode.addEventListener("click", () => {
+    currentMode = "list";
+    btnListMode.classList.add("active");
+    btnQaMode.classList.remove("active");
+    listModeArea.classList.remove("hidden");
+    qaModeArea.classList.add("hidden");
+    orderSelect.classList.add("hidden");
+    qaTypeSelect.classList.add("hidden");
+    renderList();
+  });
+
+  btnQaMode.addEventListener("click", () => {
+    currentMode = "qa";
+    btnQaMode.classList.add("active");
+    btnListMode.classList.remove("active");
+    qaModeArea.classList.remove("hidden");
+    listModeArea.classList.add("hidden");
+    orderSelect.classList.remove("hidden");
+    qaTypeSelect.classList.remove("hidden");
+    resetQaDeck();
+    showNextQaQuestion();
+  });
+
+  qaCard.addEventListener("click", () => {
+    if (!currentQaItem) return;
+    if (qaAnswerBox.classList.contains("hidden")) {
+      qaAnswerBox.classList.remove("hidden");
+      qaHint.classList.add("hidden");
+    }
+  });
+
+  nextQaBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showNextQaQuestion();
+  });
+
+  qaTypeSelect.addEventListener("change", () => {
+    resetQaDeck();
+    showNextQaQuestion();
+  });
+
+  orderSelect.addEventListener("change", () => {
+    resetQaDeck();
+    showNextQaQuestion();
+  });
+
+  categoryFilter.addEventListener("change", () => {
+    if (currentMode === "list") {
+      renderList();
+    } else {
+      resetQaDeck();
+      showNextQaQuestion();
+    }
+  });
+
+  searchInput.addEventListener("input", () => {
+    if (currentMode === "list") {
+      renderList();
+    } else {
+      resetQaDeck();
+      showNextQaQuestion();
+    }
+  });
+
+  renderList();
+</script>
+
+</body>
+</html>
