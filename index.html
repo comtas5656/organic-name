@@ -91,6 +91,89 @@
       background: rgba(255, 255, 255, 0.35);
     }
 
+    /* バージョン更新モーダルダイアログ */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .modal-body {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.6;
+      max-height: 60vh;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .modal-body ul {
+      margin: 6px 0;
+      padding-left: 20px;
+    }
+
+    .modal-body li {
+      margin-bottom: 4px;
+    }
+
+    .modal-footer {
+      text-align: right;
+    }
+
+    .modal-btn {
+      background-color: var(--secondary-color);
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 13px;
+      transition: opacity 0.2s;
+    }
+
+    .modal-btn:hover {
+      opacity: 0.9;
+    }
+
     .container {
       max-width: 1000px;
       margin: 0 auto;
@@ -119,6 +202,7 @@
       border-radius: 10px;
       margin-left: 6px;
       vertical-align: middle;
+      cursor: pointer;
     }
 
     .mode-tabs {
@@ -424,9 +508,24 @@
     <button class="version-notice-close" id="closeNoticeBtn">了解</button>
   </div>
 
+  <!-- 更新内容お知らせモーダルダイアログ -->
+  <div id="updateModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">🎉 バージョンアップのお知らせ</div>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- JSで動的に追加されます -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" id="closeModalBtn">閉じる</button>
+      </div>
+    </div>
+  </div>
+
   <div class="header-container">
     <h1>有機なまえ暗記倶楽部</h1>
-    <span class="version-badge" id="versionBadge">v1.0.2</span>
+    <span class="version-badge" id="versionBadge" title="更新履歴を表示">v1.0.2</span>
   </div>
 
   <!-- モード切替 -->
@@ -503,10 +602,56 @@
 
 <script>
   // ==========================================
-  // バージョン管理設定
+  // バージョン管理・更新履歴設定
   // ==========================================
   const CURRENT_VERSION = "1.0.2";
   const STORAGE_KEY_VERSION = "organic_app_version";
+
+  const UPDATES_HISTORY = [
+    {
+      version: "1.0.2",
+      date: "2026-04-12",
+      changes: [
+        "バージョンアップお知らせ機能（ポップアップダイアログ）を追加しました",
+        "モバイル環境における1問1答モードのレイアウト安定性を向上しました",
+        "要復習機能の動作ロジックを最適化しました"
+      ]
+    },
+    {
+      version: "1.0.1",
+      date: "2026-03-20",
+      changes: [
+        "1問1答モードでの画像表示サイズを微調整しました",
+        "軽微な表示崩れを修正しました"
+      ]
+    },
+    {
+      version: "1.0.0",
+      date: "2026-03-01",
+      changes: [
+        "有機なまえ暗記倶楽部を新規公開（全75物質収録）"
+      ]
+    }
+  ];
+
+  function openUpdateModal(historyData) {
+    const modal = document.getElementById("updateModal");
+    const modalBody = document.getElementById("modalBody");
+    
+    let html = "";
+    historyData.forEach(item => {
+      html += `<div style="margin-bottom: 12px;">
+        <strong style="color: var(--primary-color);">v${item.version} (${item.date})</strong>
+        <ul>`;
+      item.changes.forEach(change => {
+        html += `<li>${change}</li>`;
+      });
+      html += `</ul></div>`;
+    });
+
+    modalBody.innerHTML = html;
+    modal.classList.remove("hidden");
+  }
 
   function checkVersionUpdate() {
     const savedVersion = localStorage.getItem(STORAGE_KEY_VERSION);
@@ -518,19 +663,51 @@
     versionBadge.textContent = `v${CURRENT_VERSION}`;
 
     if (!savedVersion) {
+      // 初回訪問時
       versionNoticeTitle.textContent = "アプリへようこそ！";
       versionNoticeDetail.textContent = `最新バージョン (v${CURRENT_VERSION}) をご利用いただけます。`;
       versionNotice.classList.remove("hidden");
+      openUpdateModal([UPDATES_HISTORY[0]]);
     } else if (savedVersion !== CURRENT_VERSION) {
+      // バージョンアップ時
       versionNoticeTitle.textContent = "アプリが更新されました！";
       versionNoticeDetail.textContent = `v${savedVersion} から v${CURRENT_VERSION} にアップデートされました。`;
       versionNotice.classList.remove("hidden");
+      
+      // 更新差分履歴を取得してモーダル表示
+      const newHistories = UPDATES_HISTORY.filter(item => {
+        return compareVersions(item.version, savedVersion) > 0;
+      });
+      openUpdateModal(newHistories.length > 0 ? newHistories : [UPDATES_HISTORY[0]]);
     }
 
     document.getElementById("closeNoticeBtn").addEventListener("click", () => {
       localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
       versionNotice.classList.add("hidden");
     });
+
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
+      document.getElementById("updateModal").classList.add("hidden");
+    });
+
+    // バッジクリックでいつでも全履歴表示
+    versionBadge.addEventListener("click", () => {
+      openUpdateModal(UPDATES_HISTORY);
+    });
+  }
+
+  // 簡易バージョン比較 (v1 > v2 => 1, v1 < v2 => -1, equal => 0)
+  function compareVersions(v1, v2) {
+    const p1 = v1.split('.').map(Number);
+    const p2 = v2.split('.').map(Number);
+    for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+      const num1 = p1[i] || 0;
+      const num2 = p2[i] || 0;
+      if (num1 > num2) return 1;
+      if (num1 < num2) return -1;
+    }
+    return 0;
   }
 
   // カテゴリーごとのカラーコード取得補助関数
