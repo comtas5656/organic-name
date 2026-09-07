@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>有機構造式暗記倶楽部</title>
+  <meta name="app-version" content="1.0.2">
+  <title>有機なまえ暗記倶楽部</title>
 
   <!-- アイコン設定（PCタブ用 & iOSホーム画面用） -->
-  <link rel="icon" href="icon.png?v=1.0.1" type="image/png">
-  <link rel="apple-touch-icon" href="icon.png?v=1.0.1">
+  <link rel="icon" href="icon.png?v=1.0.2" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png?v=1.0.2">
 
   <!-- PWA設定（Android / Chrome用） -->
-  <link rel="manifest" href="manifest.json?v=1.0.1">
+  <link rel="manifest" href="manifest.json?v=1.0.2">
   <meta name="theme-color" content="#2c3e50">
 
   <!-- iOS (Safari) 用のPWA全画面表示設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="構造式暗記">
+  <meta name="apple-mobile-web-app-title" content="有機なまえ暗記">
 
   <style>
     *, *::before, *::after {
@@ -30,6 +31,14 @@
       --card-bg: #ffffff;
       --text-color: #333333;
       --border-color: #e9ecef;
+
+      /* グループ別イメージカラー定義 */
+      --cat-hydrocarbon: #2c3e50;  /* 炭化水素：ダークブルー */
+      --cat-oxygen: #16a085;       /* 酸素系脂肪族：ティール/青緑 */
+      --cat-aromatic: #8e44ad;     /* 芳香族全般：パープル */
+      --cat-sugar: #d35400;        /* 糖類：アンバー */
+      --cat-amino: #c0392b;        /* アミノ酸：ローズ */
+      --cat-polymer: #27ae60;      /* 高分子原料：エメラルド */
     }
 
     body {
@@ -169,6 +178,7 @@
       background-color: var(--card-bg);
       border-radius: 8px;
       border: 1px solid var(--border-color);
+      border-left: 5px solid var(--secondary-color);
       padding: 12px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       transition: transform 0.2s, box-shadow 0.2s;
@@ -184,6 +194,18 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
+    /* カテゴリーごとの左端線 */
+    .card.border-炭化水素 { border-left-color: var(--cat-hydrocarbon); }
+    .card.border-アルコール・エーテル,
+    .card.border-アルデヒド・ケトン,
+    .card.border-カルボン酸 { border-left-color: var(--cat-oxygen); }
+    .card.border-芳香族（1置換体）,
+    .card.border-芳香族（2置換体以上）,
+    .card.border-芳香族（誘導体） { border-left-color: var(--cat-aromatic); }
+    .card.border-糖類 { border-left-color: var(--cat-sugar); }
+    .card.border-アミノ酸の側鎖 { border-left-color: var(--cat-amino); }
+    .card.border-高分子の原料 { border-left-color: var(--cat-polymer); }
+
     .card-category {
       display: inline-block;
       font-size: 11px;
@@ -194,6 +216,18 @@
       border-radius: 4px;
       margin-bottom: 6px;
     }
+
+    /* カテゴリーごとのバッジ背景色 */
+    .cat-炭化水素 { background-color: var(--cat-hydrocarbon) !important; }
+    .cat-アルコール・エーテル,
+    .cat-アルデヒド・ケトン,
+    .cat-カルボン酸 { background-color: var(--cat-oxygen) !important; }
+    .cat-芳香族（1置換体）,
+    .cat-芳香族（2置換体以上）,
+    .cat-芳香族（誘導体） { background-color: var(--cat-aromatic) !important; }
+    .cat-糖類 { background-color: var(--cat-sugar) !important; }
+    .cat-アミノ酸の側鎖 { background-color: var(--cat-amino) !important; }
+    .cat-高分子の原料 { background-color: var(--cat-polymer) !important; }
 
     .card-name {
       font-size: 16px;
@@ -236,7 +270,7 @@
       align-items: center;
       margin-top: 0;
       width: 100%;
-      padding-bottom: 90px; /* 下部ボタンと被らない十分な余白 */
+      padding-bottom: 90px;
     }
 
     .qa-card {
@@ -251,7 +285,7 @@
       cursor: pointer;
       user-select: none;
       min-height: 240px;
-      max-height: calc(100vh - 240px); /* 万が一の溢れ防止でカード内をスクロール可能に */
+      max-height: calc(100vh - 240px);
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -262,12 +296,12 @@
     }
 
     .qa-card:hover {
-      border-color: #1d6fa5;
+      opacity: 0.95;
     }
 
     .qa-img img {
       max-width: 100%;
-      max-height: 130px; /* 一覧より少し小さめにして表示領域を確保 */
+      max-height: 130px;
       object-fit: contain;
     }
 
@@ -391,8 +425,8 @@
   </div>
 
   <div class="header-container">
-    <h1>有機構造式暗記倶楽部</h1>
-    <span class="version-badge" id="versionBadge">v1.0.1</span>
+    <h1>有機なまえ暗記倶楽部</h1>
+    <span class="version-badge" id="versionBadge">v1.0.2</span>
   </div>
 
   <!-- モード切替 -->
@@ -425,7 +459,7 @@
 
     <!-- 1問1答専用：出題順序の設定 -->
     <select id="orderSelect" class="hidden">
-      <option value="random">出題順: ランダム（全問被りなし）</option>
+      <option value="random">出題順: ランダム</option>
       <option value="sequential">出題順: 順番通り</option>
       <option value="reviewOnly">出題順: 要復習チェックのみ</option>
     </select>
@@ -471,7 +505,7 @@
   // ==========================================
   // バージョン管理設定
   // ==========================================
-  const CURRENT_VERSION = "1.0.1";
+  const CURRENT_VERSION = "1.0.2";
   const STORAGE_KEY_VERSION = "organic_app_version";
 
   function checkVersionUpdate() {
@@ -484,12 +518,10 @@
     versionBadge.textContent = `v${CURRENT_VERSION}`;
 
     if (!savedVersion) {
-      // 初回訪問時
       versionNoticeTitle.textContent = "アプリへようこそ！";
       versionNoticeDetail.textContent = `最新バージョン (v${CURRENT_VERSION}) をご利用いただけます。`;
       versionNotice.classList.remove("hidden");
     } else if (savedVersion !== CURRENT_VERSION) {
-      // アプリ更新時
       versionNoticeTitle.textContent = "アプリが更新されました！";
       versionNoticeDetail.textContent = `v${savedVersion} から v${CURRENT_VERSION} にアップデートされました。`;
       versionNotice.classList.remove("hidden");
@@ -499,6 +531,23 @@
       localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
       versionNotice.classList.add("hidden");
     });
+  }
+
+  // カテゴリーごとのカラーコード取得補助関数
+  function getCategoryColorCode(cat) {
+    switch(cat) {
+      case "炭化水素": return "#2c3e50";
+      case "アルコール・エーテル":
+      case "アルデヒド・ケトン":
+      case "カルボン酸": return "#16a085";
+      case "芳香族（1置換体）":
+      case "芳香族（2置換体以上）":
+      case "芳香族（誘導体）": return "#8e44ad";
+      case "糖類": return "#d35400";
+      case "アミノ酸の側鎖": return "#c0392b";
+      case "高分子の原料": return "#27ae60";
+      default: return "#3498db";
+    }
   }
 
   // ==========================================
@@ -651,9 +700,9 @@
 
     filtered.forEach(item => {
       const card = document.createElement("div");
-      card.className = "card";
+      card.className = `card border-${item.category}`;
       card.innerHTML = `
-        <span class="card-category">${item.category}</span>
+        <span class="card-category cat-${item.category}">${item.category}</span>
         <div class="card-name">${item.name}</div>
         <div class="card-img-box">
           <img src="${getImgPath(item.file)}" alt="${item.name}" onerror="this.onerror=null; this.alt='[画像非表示: ${item.file}.png]';">
@@ -698,6 +747,8 @@
   function showNextQaQuestion() {
     if (qaDeck.length === 0) {
       qaCategory.textContent = "-";
+      qaCategory.className = "card-category";
+      qaCard.style.borderColor = "var(--secondary-color)";
       if (orderSelect.value === "reviewOnly") {
         qaQuestionContent.innerHTML = "<div style='font-size:15px; font-weight:bold;'>復習用（要復習）の問題はありません！</div>";
       } else {
@@ -733,6 +784,8 @@
     currentQaItem = qaDeck[qaIndex];
 
     qaCategory.textContent = currentQaItem.category;
+    qaCategory.className = `card-category cat-${currentQaItem.category}`;
+    qaCard.style.borderColor = getCategoryColorCode(currentQaItem.category);
 
     const qaType = qaTypeSelect.value;
     const imgHtml = `<div class="qa-img"><img src="${getImgPath(currentQaItem.file)}" alt="${currentQaItem.name}" onerror="this.onerror=null; this.alt='[画像非表示: ${currentQaItem.file}.png]';"></div>`;
