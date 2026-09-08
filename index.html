@@ -607,6 +607,7 @@
   const CURRENT_VERSION = "1.0.2";
   const STORAGE_KEY_VERSION = "organic_app_version";
 
+  // 更新履歴データ（配列形式：新しい順）
   const UPDATES_HISTORY = [
     {
       version: "1.0.2",
@@ -634,71 +635,90 @@
     }
   ];
 
-  function openUpdateModal(historyData) {
-    const modal = document.getElementById("updateModal");
-    const modalBody = document.getElementById("modalBody");
-    
-    let html = "";
-    historyData.forEach(item => {
-      html += `<div style="margin-bottom: 12px;">
-        <strong style="color: var(--primary-color);">v${item.version} (${item.date})</strong>
-        <ul>`;
-      item.changes.forEach(change => {
-        html += `<li>${change}</li>`;
-      });
-      html += `</ul></div>`;
-    });
-
-    modalBody.innerHTML = html;
-    modal.classList.remove("hidden");
-  }
-
   function checkVersionUpdate() {
-    const savedVersion = localStorage.getItem(STORAGE_KEY_VERSION);
-    const versionBadge = document.getElementById("versionBadge");
-    const versionNotice = document.getElementById("versionNotice");
-    const versionNoticeTitle = document.getElementById("versionNoticeTitle");
-    const versionNoticeDetail = document.getElementById("versionNoticeDetail");
+      const savedVersion = localStorage.getItem(STORAGE_KEY_VERSION);
+      const versionBadge = document.getElementById("versionBadge");
+      const versionNotice = document.getElementById("versionNotice");
+      const versionNoticeTitle = document.getElementById("versionNoticeTitle");
+      const versionNoticeDetail = document.getElementById("versionNoticeDetail");
 
-    versionBadge.textContent = `v${CURRENT_VERSION}`;
+        if (versionBadge) {
+        versionBadge.textContent = `v${CURRENT_VERSION}`;
+      }
 
-    if (!savedVersion) {
-      // 初回訪問時
-      versionNoticeTitle.textContent = "アプリへようこそ！";
-      versionNoticeDetail.textContent = `最新バージョン (v${CURRENT_VERSION}) をご利用いただけます。`;
-      versionNotice.classList.remove("hidden");
-      openUpdateModal([UPDATES_HISTORY[0]]);
-    } else if (savedVersion !== CURRENT_VERSION) {
-      // バージョンアップ時
-      versionNoticeTitle.textContent = "アプリが更新されました！";
-      versionNoticeDetail.textContent = `v${savedVersion} から v${CURRENT_VERSION} にアップデートされました。`;
-      versionNotice.classList.remove("hidden");
+        // --- バージョンチェック判定 ---
+      if (!savedVersion) {
+        // 初回訪問時
+        if (versionNoticeTitle) versionNoticeTitle.textContent = "アプリへようこそ！";
+        if (versionNoticeDetail) versionNoticeDetail.textContent = `最新バージョン (v${CURRENT_VERSION}) をご利用いただけます。`;
+        if (versionNotice) versionNotice.classList.remove("hidden");
+
+          // 最新の更新内容を1つだけモーダル表示
+        openUpdateModal([UPDATES_HISTORY[0]]);
+
+        } else if (compareVersions(CURRENT_VERSION, savedVersion) > 0) {
+        // バージョンアップ時（savedVersion より CURRENT_VERSION が新しい場合）
+        if (versionNoticeTitle) versionNoticeTitle.textContent = "アプリが更新されました！";
+        if (versionNoticeDetail) versionNoticeDetail.textContent = `v${savedVersion} から v${CURRENT_VERSION} にアップデートされました。`;
+        if (versionNotice) versionNotice.classList.remove("hidden");
+
+          // 保存されているバージョンより新しい更新履歴をすべて取得
+        const newHistories = UPDATES_HISTORY.filter(item => {
+          return compareVersions(item.version, savedVersion) > 0;
+        });
+
+          openUpdateModal(newHistories.length > 0 ? newHistories : [UPDATES_HISTORY[0]]);
+      }
+
+        // --- イベントリスナーの登録 ---
+      const closeNoticeBtn = document.getElementById("closeNoticeBtn");
+      if (closeNoticeBtn) {
+        closeNoticeBtn.onclick = () => {
+          localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
+          if (versionNotice) versionNotice.classList.add("hidden");
+        };
+      } // ← if (closeNoticeBtn) の閉じカッコ
+
+        const closeModalBtn = document.getElementById("closeModalBtn");
+      if (closeModalBtn) {
+        closeModalBtn.onclick = () => {
+          localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
+          const updateModal = document.getElementById("updateModal");
+          if (updateModal) updateModal.classList.add("hidden");
+        };
+      }
+
+        // バッジクリックで全履歴表示
+      if (versionBadge) {
+        versionBadge.onclick = () => {
+          openUpdateModal(UPDATES_HISTORY);
+        };
+      }
+    } // ← checkVersionUpdate 関数の閉じカッコ
+
+      // モーダル表示用共通関数
+    function openUpdateModal(historyData) {
+      const modal = document.getElementById("updateModal");
+      const modalBody = document.getElementById("modalBody");
       
-      // 更新差分履歴を取得してモーダル表示
-      const newHistories = UPDATES_HISTORY.filter(item => {
-        return compareVersions(item.version, savedVersion) > 0;
+      let html = "";
+      historyData.forEach(item => { // ← histories を historyData に修正
+        html += `<div style="margin-bottom: 12px; border-bottom: 1px dashed #ccc; padding-bottom: 8px;">`;
+        html += `<strong>v${item.version}</strong> <span style="font-size: 11px; color: #666;">(${item.date || ''})</span>`;
+        html += `<ul style="margin: 4px 0 0 18px; padding: 0; font-size: 13px;">`;
+        // item.notes を item.changes に修正
+        (item.changes || []).forEach(change => {
+          html += `<li>${change}</li>`;
+        });
+        html += `</ul></div>`;
       });
-      openUpdateModal(newHistories.length > 0 ? newHistories : [UPDATES_HISTORY[0]]);
+
+        modalBody.innerHTML = html;
+      modal.classList.remove("hidden");
     }
-
-    document.getElementById("closeNoticeBtn").addEventListener("click", () => {
-      localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
-      versionNotice.classList.add("hidden");
-    });
-
-    document.getElementById("closeModalBtn").addEventListener("click", () => {
-      localStorage.setItem(STORAGE_KEY_VERSION, CURRENT_VERSION);
-      document.getElementById("updateModal").classList.add("hidden");
-    });
-
-    // バッジクリックでいつでも全履歴表示
-    versionBadge.addEventListener("click", () => {
-      openUpdateModal(UPDATES_HISTORY);
-    });
-  }
-
   // 簡易バージョン比較 (v1 > v2 => 1, v1 < v2 => -1, equal => 0)
   function compareVersions(v1, v2) {
+    if (!v1 || !v2) return 0;
     const p1 = v1.split('.').map(Number);
     const p2 = v2.split('.').map(Number);
     for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
@@ -709,6 +729,7 @@
     }
     return 0;
   }
+
 
   // カテゴリーごとのカラーコード取得補助関数
   function getCategoryColorCode(cat) {
