@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="app-version" content="1.0.3">
+  <meta name="app-version" content="1.0.4">
   <title>有機なまえ暗記倶楽部</title>
 
   <!-- アイコン設定（PCタブ用 & iOSホーム画面用） -->
-  <link rel="icon" href="icon.png?v=1.0.3" type="image/png">
-  <link rel="apple-touch-icon" href="icon.png?v=1.0.3">
+  <link rel="icon" href="icon.png?v=1.0.4" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png?v=1.0.4">
 
   <!-- PWA設定（Android / Chrome用） -->
-  <link rel="manifest" href="manifest.json?v=1.0.3">
+  <link rel="manifest" href="manifest.json?v=1.0.4">
   <meta name="theme-color" content="#2c3e50">
 
   <!-- iOS (Safari) 用のPWA全画面表示設定 -->
@@ -516,7 +516,7 @@
 
   <div class="header-container">
     <h1>有機なまえ暗記倶楽部</h1>
-    <span class="version-badge" id="versionBadge" title="更新履歴を表示">v1.0.3</span>
+    <span class="version-badge" id="versionBadge" title="更新履歴を表示">v1.0.4</span>
   </div>
 
   <!-- モード切替 -->
@@ -528,7 +528,7 @@
   <!-- 絞り込み・設定コントロール -->
   <div class="controls">
     <select id="categoryFilter">
-      <option value="ALL">すべてのカテゴリー（全75種）</option>
+      <option value="ALL">すべてのカテゴリー（全76種）</option>
       <option value="炭化水素">炭化水素</option>
       <option value="アルコール・エーテル">アルコール・エーテル</option>
       <option value="アルデヒド・ケトン">アルデヒド・ケトン</option>
@@ -595,11 +595,19 @@
   // ==========================================
   // バージョン管理・更新履歴設定
   // ==========================================
-  const CURRENT_VERSION = "1.0.3";
+  const CURRENT_VERSION = "1.0.4";
   const STORAGE_KEY_VERSION = "organic_app_version";
 
   // 更新履歴データ（配列形式：新しい順）
   const UPDATES_HISTORY = [
+    {
+      version: "1.0.4",
+      date: "2026-09-24",
+      changes: [
+        "トランス-2-ブテンとシス-2-ブテンの画像を修正しました",
+        "2-プロパノールを追加しました"
+      ]
+    },
     {
       version: "1.0.3",
       date: "2026-09-10",
@@ -747,7 +755,7 @@
   }
 
   // ==========================================
-  // 暗記データベース（全75物質）
+  // 暗記データベース（全76物質）
   // ==========================================
   const chemicalData = [
     // 炭化水素
@@ -769,6 +777,7 @@
     { id: 14, file: "methanol", name: "メタノール", category: "アルコール・エーテル" },
     { id: 15, file: "ethanol", name: "エタノール", category: "アルコール・エーテル" },
     { id: 16, file: "1-propanol", name: "1-プロパノール", category: "アルコール・エーテル" },
+    { id: 76, file: "2-propanol", name: "2-プロパノール", category: "アルコール・エーテル" },
     { id: 17, file: "dimethyl-ether", name: "ジメチルエーテル", category: "アルコール・エーテル" },
     { id: 18, file: "diethyl-ether", name: "ジエチルエーテル", category: "アルコール・エーテル" },
 
